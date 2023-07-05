@@ -1,18 +1,17 @@
-import { useState } from "react";
-import "./index.css";
-import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import setQuote from "./action-creators";
 import twitterLogo from "./assets/twitter-logo.png";
 import { FaQuoteLeft } from "react-icons/fa";
+import "./index.css";
+import { useEffect } from "react";
 
 function App() {
-  const [response, setResponse] = useState({
-    quote: "",
-    author: "",
-  });
+  const quote = useSelector((state) => state.quote.quote);
+  const author = useSelector((state) => state.quote.author);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchQuote();
-    console.log("1");
   }, []);
 
   function handleNewQuote() {
@@ -32,18 +31,15 @@ function App() {
         }
       );
       const jsonData = await apiResponse.json();
-      setResponse((prev) => ({
-        ...prev,
-        quote: jsonData[0].quote,
-        author: jsonData[0].author,
-      }));
-      console.log("2");
+
+      const newQuote = jsonData[0].quote;
+      const newAuthor = jsonData[0].author;
+      dispatch(setQuote(newQuote, newAuthor));
     } catch (error) {
       console.log("Error fetching quote:", error);
     }
   };
 
-  console.log("3");
   return (
     <>
       <div id="quote-box">
@@ -52,15 +48,15 @@ function App() {
             <i className="quote-icon">
               <FaQuoteLeft />
             </i>
-            {response.quote}
+            {quote}
           </span>
-          <p id="author">- {response.author}</p>
+          <p id="author">- {author}</p>
 
           <div className="group-button twitter-share-button">
             <button id="twitter-button">
               <a
                 id="tweet-quote"
-                href={`https://twitter.com/intent/tweet?text=${response.quote}%20-${response.author}%20#quotes`}
+                href={`https://twitter.com/intent/tweet?text=${quote}%20-${author}%20%23quotes`}
               >
                 <img src={twitterLogo} alt="twitter-logo" width="35px" />
               </a>
